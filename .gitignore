@@ -31,3 +31,7 @@ backend/uploads/
 
 # Attachments pulled off the old server by scripts/attachments-rescue.mjs
 backend/attachment-backup/
+
+*Processed files*
+Process.md*
+/Expansion

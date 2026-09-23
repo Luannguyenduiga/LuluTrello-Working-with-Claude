@@ -290,10 +290,13 @@ export default function BoardDetail() {
         body: JSON.stringify({ title, status: 'Icebox' })
       });
       const data = await res.json();
-      setTasks(prev => ({
-        ...prev,
-        [cardId]: [...(prev[cardId] || []), data]
-      }));
+      // If the task already exists in the state (e.g., due to a socket event), don't add it again
+      // Because client optimistic updates and socket events can cause duplicates if not handled carefully
+      setTasks(prev => {
+        const list = prev[cardId] || [];
+        if (list.some(t => t.id === data.id)) return prev;
+        return { ...prev, [cardId]: [...list, data] };
+      });
     } catch (err) {
       console.error('Failed to add task', err);
     }
