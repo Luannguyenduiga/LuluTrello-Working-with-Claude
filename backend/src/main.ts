@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType, VERSION_NEUTRAL } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
@@ -10,6 +10,14 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // URI versioning: routes tagged with a version answer under /v1, /v2, ... while
+  // everything else (Lulu's own frontend routes) stays version-neutral at its
+  // current path. The CRM integration routes use this to pin a stable /v1 contract.
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: VERSION_NEUTRAL,
+  });
   // Add this line to allow large file uploads with limit 50mb
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ limit: '50mb', extended: true }));
@@ -39,6 +47,7 @@ async function bootstrap() {
       'jwt',
     )
     .addApiKey({ type: 'apiKey', name: 'x-zalo-secret', in: 'header' }, 'zalo-secret')
+    .addApiKey({ type: 'apiKey', name: 'x-crm-secret', in: 'header' }, 'crm-secret')
     .addTag('Auth', 'Sign-in by email code or GitHub OAuth')
     .addTag('Boards', 'Workspaces, their members and invitations')
     .addTag('Cards', 'Columns inside a board')
@@ -47,6 +56,7 @@ async function bootstrap() {
     .addTag('Slides', 'Turning board attachments into a PowerPoint deck')
     .addTag('Admin', 'Admin console - restricted to ADMIN_EMAILS')
     .addTag('Zalo', 'Setup and operations for the Zalo assistant')
+    .addTag('CRM Integration', 'Task operations for the Lyno CRM (x-crm-secret, /v1)')
     .addTag('Health', 'Liveness probe')
     .build();
   const document = SwaggerModule.createDocument(app, configSwagger);

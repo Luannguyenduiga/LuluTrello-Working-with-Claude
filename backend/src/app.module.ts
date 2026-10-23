@@ -14,6 +14,7 @@ import { CardsModule } from './cards/cards.module';
 import { TasksModule } from './tasks/tasks.module';
 import { SlidesModule } from './slides/slides.module';
 import { AdminModule } from './admin/admin.module';
+import { IntegrationModule } from './integration/integration.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AdminModule } from './admin/admin.module';
     TasksModule,
     SlidesModule,
     AdminModule,
+    IntegrationModule,
   ],
   controllers: [AppController],
 })
